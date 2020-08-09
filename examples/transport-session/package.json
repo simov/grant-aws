@@ -1,0 +1,20 @@
+{
+  "name": "grant-examples",
+  "version": "0.0.0",
+  "description": "Grant Examples",
+  "private": true,
+  "license": "MIT",
+  "homepage": "https://github.com/simov/grant",
+  "author": "Simeon Velichkov <simeonvelichkov@gmail.com> (https://simov.github.io)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simov/grant.git"
+  },
+  "dependencies": {
+    "serverless": "^1.73.1",
+    "serverless-offline": "^6.4.0"
+  },
+  "scripts": {
+    "start": "serverless offline start"
+  }
+}

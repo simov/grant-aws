@@ -1,0 +1,35 @@
+service: grant
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-west-2
+  stage: grant
+
+functions:
+  transport-querystring:
+    handler: grant/grant.handler
+    events:
+      - http:
+          path: /grant/{path+}
+          method: ANY
+  hello:
+    handler: callback/callback.handler
+    events:
+      - http:
+          path: /grant/hello
+          method: GET
+  hi:
+    handler: callback/callback.handler
+    events:
+      - http:
+          path: /grant/hi
+          method: GET
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    port: 3000
+    noPrependStageInUrl: true
