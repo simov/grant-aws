@@ -10,6 +10,9 @@ lambda  ?= grant
 profile ?= ...
 region  ?= us-west-2
 
+api_type     ?= http-api
+event_format ?= 1.0
+
 firebase_path ?= ...
 firebase_auth ?= ...
 
@@ -61,6 +64,8 @@ plan:
 	TF_VAR_callback=${callback} \
 	TF_VAR_lambda=${lambda} \
 	TF_VAR_region=${region} \
+	TF_VAR_api_type=${api_type} \
+	TF_VAR_event_format=${event_format} \
 	TF_VAR_example=${example} \
 	TF_VAR_firebase_path=${firebase_path} \
 	TF_VAR_firebase_auth=${firebase_auth} \
@@ -74,6 +79,8 @@ apply:
 	TF_VAR_callback=${callback} \
 	TF_VAR_lambda=${lambda} \
 	TF_VAR_region=${region} \
+	TF_VAR_api_type=${api_type} \
+	TF_VAR_event_format=${event_format} \
 	TF_VAR_example=${example} \
 	TF_VAR_firebase_path=${firebase_path} \
 	TF_VAR_firebase_auth=${firebase_auth} \
@@ -87,6 +94,8 @@ destroy:
 	TF_VAR_callback=${callback} \
 	TF_VAR_lambda=${lambda} \
 	TF_VAR_region=${region} \
+	TF_VAR_api_type=${api_type} \
+	TF_VAR_event_format=${event_format} \
 	TF_VAR_example=${example} \
 	TF_VAR_firebase_path=${firebase_path} \
 	TF_VAR_firebase_auth=${firebase_auth} \

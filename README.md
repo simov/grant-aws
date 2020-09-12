@@ -26,7 +26,9 @@ exports.handler = async (event) => {
 
 The `config` key expects your [**Grant** configuration][grant-config].
 
-#### AWS API Gateway
+## AWS API Gateway
+
+### Default Domain
 
 You have to specify the absolute path `prefix` that includes your stage name:
 
@@ -40,23 +42,76 @@ You have to specify the absolute path `prefix` that includes your stage name:
 }
 ```
 
+Login URL, and the respective Redirect URI of your OAuth app:
+
+```
+https://[id].execute-api.[region].amazonaws.com/[stage]/connect/google
+https://[id].execute-api.[region].amazonaws.com/[stage]/connect/google/callback
+```
+
+### Custom Domain
+
+You have to omit the stage name:
+
+```json
+{
+  "defaults": {
+    "origin": "https://amazing.com",
+    "prefix": "/connect"
+  },
+  "google": {}
+}
+```
+
+Login URL, and the respective Redirect URI of your OAuth app:
+
+```
+https://amazing.com/connect/google
+https://amazing.com/connect/google/callback
+```
+
+### Custom Domain + Path Mapping
+
+You have to specify the absolute path `prefix` that includes your Path Mapping:
+
+```json
+{
+  "defaults": {
+    "origin": "https://amazing.com",
+    "prefix": "/v1/connect"
+  },
+  "google": {}
+}
+```
+
+Login URL, and the respective Redirect URI of your OAuth app:
+
+```
+https://amazing.com/v1/connect/google
+https://amazing.com/v1/connect/google/callback
+```
+
+**NOTE:** Event Format v2 have a bug, and it never sends the absolute path to your lambda handler.
+
+In that case only, you have to omit the Path Mapping in your `prefix`, and you have to set the `redirect_uri` explicitly:
+
+```json
+{
+  "defaults": {
+    "origin": "https://amazing.com",
+    "prefix": "/connect"
+  },
+  "google": {
+    "redirect_uri": "https://amazing.com/v1/connect/google/callback"
+  }
+}
+```
+
 ---
 
 ## Routes
 
-You login by navigating to:
-
-```
-https://[id].execute-api.[region].amazonaws.com/[stage]/connect/google
-```
-
-The redirect URL of your OAuth app have to be set to:
-
-```
-https://[id].execute-api.[region].amazonaws.com/[stage]/connect/google/callback
-```
-
-And locally:
+When running locally the following routes can be used:
 
 ```
 http://localhost:3000/[stage]/connect/google
@@ -133,14 +188,14 @@ Parameter | Availability | Description
 
 ## Examples
 
-Example | Session | Callback λ | Deployment
-:- | :- | :- | :-
-`transport-state` | Cookie Store | ✕ | AWS HTTP API Gateway
-`transport-querystring` | Cookie Store | ✓ | AWS REST API Gateway
-`transport-session` | Firebase Session Store | ✓ | AWS REST API Gateway
-`dynamic-state` | Firebase Session Store | ✕ | AWS HTTP API Gateway
+Example | Session | Callback λ
+:- | :- | :-
+`transport-state` | Cookie Store | ✕
+`transport-querystring` | Cookie Store | ✓
+`transport-session` | Firebase Session Store | ✓
+`dynamic-state` | Firebase Session Store | ✕
 
-> _Different AWS API Gateway types and session store types were used for example purposes only._
+> _Different session store types were used for example purposes only._
 
 #### Configuration
 
@@ -164,6 +219,10 @@ https://[project].firebaseio.com/[prefix]
   }
 }
 ```
+
+- `api_type` - defaults to `http-api`, available for `rest-api` as well
+
+- `event_format` - defaults to `1.0`, available for `2.0` as well, applicable for `http-api`
 
 All variables can be passed as arguments to `make` as well:
 
