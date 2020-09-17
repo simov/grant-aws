@@ -26,11 +26,34 @@ exports.handler = async (event) => {
 
 The `config` key expects your [**Grant** configuration][grant-config].
 
-## AWS API Gateway
+## Routes
+
+Grant relies on the request path to determine the provider name and any static override being used.
+
+Grant uses the following event keys to determine the request path:
+
+| Gateway | Event | Key
+| :-:     | :-:   | :-
+| rest    | -     | event.requestContext.path
+| http    | v1    | event.path
+| http    | v2    | event.rawPath
+
+Additionally the `prefix` specified in your Grant configuration is used to generate the correct `redirect_uri` in case it is not configured explicitly.
+
+However, AWS is inconsistent in the way it sets those values under various circumstances:
 
 ### Default Domain
 
-You have to specify the absolute path `prefix` that includes your stage name:
+```
+https://[id].execute-api.[region].amazonaws.com/[stage]/connect/google
+https://[id].execute-api.[region].amazonaws.com/[stage]/connect/google/callback
+```
+
+Gateway | Event | Key                       | Value
+:-:     | :-:   | :-                        | :-
+rest    | -     | event.requestContext.path | `/stage/connect/google`
+http    | v1    | event.path                | `/stage/connect/google`
+http    | v2    | event.rawPath             | `/stage/connect/google`
 
 ```json
 {
@@ -42,18 +65,21 @@ You have to specify the absolute path `prefix` that includes your stage name:
 }
 ```
 
-Login URL, and the respective Redirect URI of your OAuth app:
-
-```
-https://[id].execute-api.[region].amazonaws.com/[stage]/connect/google
-https://[id].execute-api.[region].amazonaws.com/[stage]/connect/google/callback
-```
-
 ### Custom Domain
 
-You have to omit the stage name:
+```
+https://amazing.com/connect/google
+https://amazing.com/connect/google/callback
+```
+
+Gateway | Event | Key                       | Value
+:-:     | :-:   | :-                        | :-
+rest    | -     | event.requestContext.path | `/connect/google`
+http    | v1    | event.path                | `/connect/google`
+http    | v2    | event.rawPath             | `/stage/connect/google`
 
 ```json
+// REST API, HTTP API v1
 {
   "defaults": {
     "origin": "https://amazing.com",
@@ -63,18 +89,34 @@ You have to omit the stage name:
 }
 ```
 
-Login URL, and the respective Redirect URI of your OAuth app:
+```json
+// HTTP API v2
+{
+  "defaults": {
+    "origin": "https://amazing.com",
+    "prefix": "/stage/connect"
+  },
+  "google": {
+    "redirect_uri": "https://amazing.com/connect/google/callback"
+  }
+}
+```
+
+### Custom Domain + Path
 
 ```
-https://amazing.com/connect/google
-https://amazing.com/connect/google/callback
+https://amazing.com/v1/connect/google
+https://amazing.com/v1/connect/google/callback
 ```
 
-### Custom Domain + Path Mapping
-
-You have to specify the absolute path `prefix` that includes your Path Mapping:
+Gateway | Event | Key                       | Value
+:-:     | :-:   | :-                        | :-
+rest    | -     | event.requestContext.path | `/v1/connect/google`
+http    | v1    | event.path                | `/v1/connect/google`
+http    | v2    | event.rawPath             | `/stage/connect/google`
 
 ```json
+// REST API, HTTP API v1
 {
   "defaults": {
     "origin": "https://amazing.com",
@@ -84,22 +126,12 @@ You have to specify the absolute path `prefix` that includes your Path Mapping:
 }
 ```
 
-Login URL, and the respective Redirect URI of your OAuth app:
-
-```
-https://amazing.com/v1/connect/google
-https://amazing.com/v1/connect/google/callback
-```
-
-**NOTE:** Event Format v2 have a bug, and it never sends the absolute path to your lambda handler.
-
-In that case only, you have to omit the Path Mapping in your `prefix`, and you have to set the `redirect_uri` explicitly:
-
 ```json
+// HTTP API v2
 {
   "defaults": {
     "origin": "https://amazing.com",
-    "prefix": "/connect"
+    "prefix": "/stage/connect"
   },
   "google": {
     "redirect_uri": "https://amazing.com/v1/connect/google/callback"
@@ -109,7 +141,7 @@ In that case only, you have to omit the Path Mapping in your `prefix`, and you h
 
 ---
 
-## Routes
+## Local Routes
 
 When running locally the following routes can be used:
 
