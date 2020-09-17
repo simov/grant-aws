@@ -28,9 +28,7 @@ The `config` key expects your [**Grant** configuration][grant-config].
 
 ## Routes
 
-Grant relies on the request path to determine the provider name and any static override being used.
-
-Grant uses the following event keys to determine the request path:
+Grant relies on the request path to determine the provider name and any static override being used. The following event keys are being used to determine the request path:
 
 | Gateway | Event | Key
 | :-:     | :-:   | :-
@@ -40,7 +38,7 @@ Grant uses the following event keys to determine the request path:
 
 Additionally the `prefix` specified in your Grant configuration is used to generate the correct `redirect_uri` in case it is not configured explicitly.
 
-However, AWS is inconsistent in the way it sets those values under various circumstances:
+However, AWS is inconsistent in the way it sets those values under different circumstances, and you may have to print those event keys and adjust your Grant configuration accordingly. A few known cases:
 
 ### Default Domain
 
@@ -78,8 +76,9 @@ rest    | -     | event.requestContext.path | `/connect/google`
 http    | v1    | event.path                | `/connect/google`
 http    | v2    | event.rawPath             | `/stage/connect/google`
 
+##### REST API, HTTP API v1
+
 ```json
-// REST API, HTTP API v1
 {
   "defaults": {
     "origin": "https://amazing.com",
@@ -89,8 +88,9 @@ http    | v2    | event.rawPath             | `/stage/connect/google`
 }
 ```
 
+##### HTTP API v2
+
 ```json
-// HTTP API v2
 {
   "defaults": {
     "origin": "https://amazing.com",
@@ -102,7 +102,7 @@ http    | v2    | event.rawPath             | `/stage/connect/google`
 }
 ```
 
-### Custom Domain + Path
+### Custom Domain + Path Mapping
 
 ```
 https://amazing.com/v1/connect/google
@@ -115,8 +115,9 @@ rest    | -     | event.requestContext.path | `/v1/connect/google`
 http    | v1    | event.path                | `/v1/connect/google`
 http    | v2    | event.rawPath             | `/stage/connect/google`
 
+##### REST API, HTTP API v1
+
 ```json
-// REST API, HTTP API v1
 {
   "defaults": {
     "origin": "https://amazing.com",
@@ -126,8 +127,9 @@ http    | v2    | event.rawPath             | `/stage/connect/google`
 }
 ```
 
+##### HTTP API v2
+
 ```json
-// HTTP API v2
 {
   "defaults": {
     "origin": "https://amazing.com",
