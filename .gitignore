@@ -5,9 +5,12 @@ npm-debug.log
 package-lock.json
 .vercel/
 
-terraform/.terraform/
+.terraform/
+.terraform.lock.hcl
 *.tfstate
 *.tfstate.backup
 *.tfplan
 
 *.zip
+
+examples/grant-oauth/
